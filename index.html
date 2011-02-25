@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Color Clock (HTML edition)</title>
+    <style type="text/css" media="screen">
+        body {
+            background:#000;
+        }
+        #clockframe {
+            width:98%;
+            height:600px;
+            border:1px solid #C2D1D2;
+            margin:10px auto;
+            position:relative;
+        }
+        #clock {
+            position:absolute;
+            margin:-100px 0 0 -400px;
+            top:50%;
+            left:50%;
+            color:#C2D1D2;
+            width:800px;
+        }
+        .time-display {
+            display:block;
+            font-size:200px;
+            font-family:sans-serif;
+            text-align:center;
+        }
+        #hex {
+            display:none;
+        }
+        #selectors {
+            text-align:center;
+        }
+        #selectors a {
+            display:inline-block;
+            width:360px;
+            height:15px;
+            background:#C2D1D2;
+            opacity:0.7;
+        }
+        #selectors a:hover,
+        #selectors a.active {
+            opacity:1;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="http://davidlynch.org/toys/colorclock/jquery.color.js" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+        function dec2hex(d) {
+            var hex = Number(d).toString(16);
+            padding = typeof (padding) === "undefined" || padding === null ? padding = 2 : padding;
+            while (hex.length < padding) {
+                hex = "0" + hex;
+            }
+            return hex;
+        }
+        function time2color(variant, hours, minutes, seconds) {
+            var result = [];
+            for (var i=0; i < variant.length; i++) {
+                switch(variant[i]) {
+                    case 'h':
+                        result.push(dec2hex(parseInt((hours / 24) * 255)));
+                        break;
+                    case 'm':
+                        result.push(dec2hex(parseInt((minutes / 60) * 255)));
+                        break;
+                    case 's':
+                        result.push(dec2hex(parseInt((seconds / 60) * 255)));
+                        break;
+                }
+            };
+            return result.join('');
+        }
+        function getvariant() {
+            if(/^#[hsm]{3}$/.test(window.location.hash)) {
+                return window.location.hash.substr(1);
+            }
+            return 'hms';
+        }
+        $(function() {
+            var time = $('#time')
+                ,hex = $('#hex')
+                ,body = $('body')
+                ,clockupdate
+                ;
+            $(window).resize(function() {
+                $('#clockframe').height(window.innerHeight - 25);
+            }).resize();
+            $('#selectors a').click(function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).addClass('active').blur().siblings().removeClass('active');
+                $($(this).attr('href')).show().siblings('.time-display').hide();
+            });
+            clockupdate = function() {
+                var t = new Date(),
+                    hours = t.getHours()
+                    ,minutes = t.getMinutes()
+                    ,seconds = t.getSeconds()
+                    ,color = time2color(getvariant(), hours, minutes, seconds)
+                    ;
+                
+                hex.html(color);
+                time.html(
+                    (hours < 10 ? '0' : '') +
+                    hours +
+                    ':' +
+                    (minutes < 10 ? '0' : '') +
+                    minutes +
+                    ':' +
+                    (seconds < 10 ? '0' : '') +
+                    seconds
+                    );
+                
+                body.animate({'background-color': '#'+color});
+            };
+            clockupdate();
+            setInterval(clockupdate, 1000);
+        });
+    </script>
+</head>
+<body id="colorclock">
+    <div id="clockframe">
+        <div id="clock">
+            <div id="time" class="time-display">00:00:00</div>
+            <div id="hex" class="time-display">000000</div>
+            <div id="selectors">
+                <a href="#time" class="active"></a>
+                <a href="#hex"></a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
