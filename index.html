@@ -4,6 +4,7 @@
     <meta http-equiv="Content-type" content="text/html; charset=utf-8">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Color Clock (HTML edition)</title>
+    <link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
     <style type="text/css" media="screen">
         body {
             background:#000;
@@ -20,14 +21,15 @@
             margin:-100px 0 0 -400px;
             top:50%;
             left:50%;
-            color:#C2D1D2;
+            color:#fff;
             width:800px;
         }
         .time-display {
             display:block;
             font-size:200px;
-            font-family:sans-serif;
+            font-family:'Inconsolata', sans-serif;
             text-align:center;
+            opacity:0.8;
         }
         #hex {
             display:none;
@@ -40,11 +42,13 @@
             width:360px;
             height:15px;
             background:#C2D1D2;
-            opacity:0.7;
+            opacity:0.6;
         }
-        #selectors a:hover,
-        #selectors a.active {
+        #selectors a:hover {
             opacity:1;
+        }
+        #selectors a.active {
+            opacity:0.8;
         }
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
