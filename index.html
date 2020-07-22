@@ -8,9 +8,16 @@
     <style type="text/css" media="screen">
         body {
             background:#000;
+            -webkit-transition-property: background-color transform -webkit-transform color;
+            -webkit-transition-duration: 1s;
+            -webkit-transition-timing-function: ease-in-out;
+            transition-property: background-color transform -webkit-transform color;
+            transition-duration: 1s;
+            transition-timing-function: ease-in-out;
         }
         #clockframe {
-            width:98%;
+            box-sizing:border-box;
+            width:100%;
             height:600px;
             border:1px solid #C2D1D2;
             margin:10px auto;
@@ -51,8 +58,18 @@
             opacity:0.8;
         }
     </style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="//code.jquery.com/color/jquery.color-2.1.2.min.js" type="text/javascript" charset="utf-8"></script>
+</head>
+<body id="colorclock">
+    <div id="clockframe">
+        <div id="clock">
+            <div id="time" class="time-display">00:00:00</div>
+            <div id="hex" class="time-display">000000</div>
+            <div id="selectors">
+                <a href="#time" class="active"></a>
+                <a href="#hex"></a>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript" charset="utf-8">
         function dec2hex(d) {
             var hex = Number(d).toString(16);
@@ -85,58 +102,63 @@
             }
             return 'hms';
         }
-        $(function() {
-            var time = $('#time')
-                ,hex = $('#hex')
-                ,body = $('body')
-                ,clockupdate
-                ;
-            $(window).resize(function() {
-                $('#clockframe').height(window.innerHeight - 25);
-            }).resize();
-            $('#selectors a').click(function(e) {
+        function setHeight(el, val) {
+            if (typeof val === "function") val = val();
+            if (typeof val === "string") el.style.height = val;
+            else el.style.height = val + "px";
+        }
+        var time = document.getElementById('time')
+            ,hex = document.getElementById('hex')
+            ,selectors = document.getElementById('selectors')
+            ,frame = document.getElementById('clockframe')
+            ,body = document.body
+            ,clockupdate
+            ;
+        function onResize() {
+            setHeight(frame, window.innerHeight - 25);
+        }
+        window.addEventListener('resize', onResize);
+        onResize();
+
+        selectors.addEventListener('click', function(e) {
+            if (e.target.nodeName === "A") {
                 e.preventDefault();
                 e.stopPropagation();
-                $(this).addClass('active').blur().siblings().removeClass('active');
-                $($(this).attr('href')).show().siblings('.time-display').hide();
-            });
-            clockupdate = function() {
-                var t = new Date(),
-                    hours = t.getHours()
-                    ,minutes = t.getMinutes()
-                    ,seconds = t.getSeconds()
-                    ,color = time2color(getvariant(), hours, minutes, seconds)
-                    ;
-                
-                hex.html(color);
-                time.html(
-                    (hours < 10 ? '0' : '') +
-                    hours +
-                    ':' +
-                    (minutes < 10 ? '0' : '') +
-                    minutes +
-                    ':' +
-                    (seconds < 10 ? '0' : '') +
-                    seconds
-                    );
-                
-                body.animate({'background-color': '#'+color});
-            };
-            clockupdate();
-            setInterval(clockupdate, 1000);
-        });
+
+                selectors.querySelectorAll('.active')[0].classList.remove('active');
+
+                e.target.classList.add('active');
+                e.target.blur();
+
+                var newmode = document.querySelectorAll(e.target.getAttribute('href'))[0];
+                Array.prototype.forEach.call(newmode.parentNode.querySelectorAll('.time-display'), function(node) {
+                    node.style.display = node === newmode ? 'block' : 'none';
+                });
+            }
+        })
+        clockupdate = function() {
+            var t = new Date(),
+                hours = t.getHours()
+                ,minutes = t.getMinutes()
+                ,seconds = t.getSeconds()
+                ,color = time2color(getvariant(), hours, minutes, seconds)
+                ;
+
+            hex.innerHTML = color;
+            time.innerHTML =
+                (hours < 10 ? '0' : '') +
+                hours +
+                ':' +
+                (minutes < 10 ? '0' : '') +
+                minutes +
+                ':' +
+                (seconds < 10 ? '0' : '') +
+                seconds;
+
+            body.style.backgroundColor = '#' + color;
+        };
+        clockupdate();
+        setInterval(clockupdate, 1000);
     </script>
-</head>
-<body id="colorclock">
-    <div id="clockframe">
-        <div id="clock">
-            <div id="time" class="time-display">00:00:00</div>
-            <div id="hex" class="time-display">000000</div>
-            <div id="selectors">
-                <a href="#time" class="active"></a>
-                <a href="#hex"></a>
-            </div>
-        </div>
-    </div>
 </body>
 </html>
